@@ -1,15 +1,15 @@
-import assert from "assert";
+import { expect } from "chai";
 import fs from "fs";
 import { parseDOT } from "../lib/network/dotparser.js";
 
 describe("dotparser", function () {
-  it("should parse a DOT file into JSON", function (done) {
+  it("should parse a DOT file into JSON", function () {
     fs.readFile("test/dot.txt", function (err, data) {
       data = String(data);
 
       const graph = parseDOT(data);
 
-      assert.deepEqual(graph, {
+      expect(graph).to.deep.equal({
         type: "digraph",
         id: "test_graph",
         rankdir: "LR",
@@ -177,22 +177,20 @@ describe("dotparser", function () {
           },
         ],
       });
-
-      done();
     });
   });
 
   /**
    * DOT-format examples taken from #3015
    */
-  it("properly handles newline escape sequences in strings", function (done) {
-    let data = 'dinetwork {1 [label="new\\nline"];}';
+  it("properly handles newline escape sequences in strings", function () {
+    let data = 'dinetwork {1 [label="new\nline"];}';
 
     data = String(data);
 
     const graph = parseDOT(data);
 
-    assert.deepEqual(graph, {
+    expect(graph).to.deep.equal({
       id: "dinetwork",
       nodes: [
         {
@@ -221,7 +219,7 @@ describe("dotparser", function () {
     const graph2 = parseDOT(data2);
     //console.log(JSON.stringify(graph, null, 2));
 
-    assert.deepEqual(graph2, {
+    expect(graph2).to.deep.equal({
       type: "digraph",
       nodes: [
         {
@@ -256,7 +254,5 @@ describe("dotparser", function () {
         },
       ],
     });
-
-    done();
   });
 });

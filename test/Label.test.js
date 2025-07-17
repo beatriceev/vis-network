@@ -12,16 +12,16 @@
  *   Currently, only "size[px] name color" is valid, always 3 items with this exact spacing.
  *   All other combinations should either be rejected as error or handled gracefully.
  */
-import assert from "assert";
+import { expect } from "chai";
 import * as util from "vis-util/esnext";
 import { DataSet } from "vis-data/esnext";
 
-import { canvasMockify } from "./canvas-mock";
+import { canvasMockify } from "./canvas-mock.js";
 
-import Label from "../lib/network/modules/components/shared/Label";
-import NodesHandler from "../lib/network/modules/NodesHandler";
-import Network from "../lib/network/Network";
-import { isValidLabel } from "../lib/network/modules/components/shared/ComponentUtil";
+import Label from "../lib/network/modules/components/shared/Label.js";
+import NodesHandler from "../lib/network/modules/NodesHandler.js";
+import Network from "../lib/network/Network.js";
+import { isValidLabel } from "../lib/network/modules/components/shared/ComponentUtil.js";
 
 /**************************************************************
  * Dummy class definitions for minimal required functionality.
@@ -63,7 +63,7 @@ describe("Network Label", function () {
       body,
       {},
       options,
-      new DummyLayoutEngine()
+      new DummyLayoutEngine(),
     );
     //console.log(JSON.stringify(nodesHandler.options, null, 2));
 
@@ -89,40 +89,37 @@ describe("Network Label", function () {
       );
     };
 
-    assert.equal(
-      expected.lines.length,
+    expect(expected.lines.length).to.equal(
       returned.lines.length,
-      "Number of lines does not match, " + showBlocks()
+      "Number of lines does not match, " + showBlocks(),
     );
 
     for (let i = 0; i < returned.lines.length; ++i) {
       const retLine = returned.lines[i];
       const expLine = expected.lines[i];
 
-      assert(
-        retLine.blocks.length === expLine.blocks.length,
-        "Number of blocks does not match, " + showBlocks()
+      expect(retLine.blocks.length).to.equal(
+        expLine.blocks.length,
+        "Number of blocks does not match, " + showBlocks(),
       );
       for (let j = 0; j < retLine.blocks.length; ++j) {
         const retBlock = retLine.blocks[j];
         const expBlock = expLine.blocks[j];
 
-        assert(
-          retBlock.text === expBlock.text,
-          "Text does not match, " + showBlocks()
+        expect(retBlock.text).to.equal(
+          expBlock.text,
+          "Text does not match, " + showBlocks(),
         );
 
-        assert(retBlock.mod !== undefined);
+        expect(retBlock.mod).to.not.be.undefined;
         if (retBlock.mod === "normal" || retBlock.mod === "") {
-          assert(
-            expBlock.mod === undefined ||
-              expBlock.mod === "normal" ||
-              expBlock === "",
-            "No mod field expected in returned, " + showBlocks()
-          );
+          expect(
+            expBlock.mod,
+            "No mod field expected in returned, " + showBlocks(),
+          ).to.be.oneOf([undefined, "normal", ""]);
         } else {
-          assert(
-            retBlock.mod === expBlock.mod,
+          expect(retBlock.mod).to.equal(
+            expBlock.mod,
             "Mod fields do not match, line: " +
               i +
               ", block: " +
@@ -132,7 +129,7 @@ describe("Network Label", function () {
               ", exp: " +
               expBlock.mod +
               "\n" +
-              showBlocks()
+              showBlocks(),
           );
         }
       }
@@ -247,7 +244,7 @@ describe("Network Label", function () {
 
   const normal_widthConstraint_expected = normal_expected.slice(
     0,
-    indexWidthConstrained
+    indexWidthConstrained,
   );
   Array.prototype.push.apply(normal_widthConstraint_expected, [
     {
@@ -468,17 +465,15 @@ describe("Network Label", function () {
     this.jsdom_global();
   });
 
-  it("parses normal text labels", function (done) {
+  it("parses normal text labels", function () {
     const label = new Label({}, getOptions());
 
     checkProcessedLabels(label, normal_text, normal_expected);
     checkProcessedLabels(label, html_text, html_unchanged_expected); // html unchanged
     checkProcessedLabels(label, markdown_text, markdown_unchanged_expected); // markdown unchanged
-
-    done();
   });
 
-  it("parses html labels", function (done) {
+  it("parses html labels", function () {
     const options = getOptions();
     options.font.multi = true; // TODO: also test 'html', also test illegal value here
 
@@ -487,11 +482,9 @@ describe("Network Label", function () {
     checkProcessedLabels(label, normal_text, normal_expected); // normal as usual
     checkProcessedLabels(label, html_text, multi_expected);
     checkProcessedLabels(label, markdown_text, markdown_unchanged_expected); // markdown unchanged
-
-    done();
   });
 
-  it("parses markdown labels", function (done) {
+  it("parses markdown labels", function () {
     const options = getOptions();
     options.font.multi = "markdown"; // TODO: also test 'md', also test illegal value here
 
@@ -500,11 +493,9 @@ describe("Network Label", function () {
     checkProcessedLabels(label, normal_text, normal_expected); // normal as usual
     checkProcessedLabels(label, html_text, html_unchanged_expected); // html unchanged
     checkProcessedLabels(label, markdown_text, multi_expected);
-
-    done();
   });
 
-  it("handles normal text with widthConstraint.maximum", function (done) {
+  it("handles normal text with widthConstraint.maximum", function () {
     const options = getOptions();
 
     //
@@ -530,13 +521,11 @@ describe("Network Label", function () {
     checkProcessedLabels(
       label,
       markdown_text,
-      markdown_widthConstraint_expected
+      markdown_widthConstraint_expected,
     ); // markdown unchanged
-
-    done();
   });
 
-  it("handles html tags with widthConstraint.maximum", function (done) {
+  it("handles html tags with widthConstraint.maximum", function () {
     const options = getOptions();
     options.font.multi = true;
     options.font.maxWdt = 300;
@@ -553,13 +542,11 @@ describe("Network Label", function () {
     checkProcessedLabels(
       label,
       markdown_text,
-      markdown_widthConstraint_expected
+      markdown_widthConstraint_expected,
     );
-
-    done();
   });
 
-  it("handles markdown tags with widthConstraint.maximum", function (done) {
+  it("handles markdown tags with widthConstraint.maximum", function () {
     const options = getOptions();
     options.font.multi = "markdown";
     options.font.maxWdt = 300;
@@ -569,8 +556,6 @@ describe("Network Label", function () {
     checkProcessedLabels(label, normal_text, normal_widthConstraint_expected);
     checkProcessedLabels(label, html_text, html_widthConstraint_unchanged);
     checkProcessedLabels(label, markdown_text, multi_expected);
-
-    done();
   });
 
   describe("Multi-Fonts", function () {
@@ -648,20 +633,18 @@ describe("Network Label", function () {
        * - using multi-font 'bold' for test, the rest should work analogously
        * - using multi-font option 'color' for test, the rest should work analogously
        */
-      it("respects the font option precedence", function (done) {
+      it("respects the font option precedence", function () {
         const [network] = createNodeNetwork();
         const h = new HelperNode(network);
 
-        assert.equal(h.modBold(0).color, "#343434"); // Default value
-        assert.equal(h.modBold(1).color, "#343434"); // Default value
-        assert.equal(h.modBold(2).color, "red"); // Group value overrides default
-        assert.equal(h.modBold(3).color, "green"); // Local value overrides default
-        assert.equal(h.modBold(4).color, "green"); // Local value overrides group
-
-        done();
+        expect(h.modBold(0).color).to.equal("#343434"); // Default value
+        expect(h.modBold(1).color).to.equal("#343434"); // Default value
+        expect(h.modBold(2).color).to.equal("red"); // Group value overrides default
+        expect(h.modBold(3).color).to.equal("green"); // Local value overrides default
+        expect(h.modBold(4).color).to.equal("green"); // Local value overrides group
       });
 
-      it("handles dynamic data and option updates", function (done) {
+      it("handles dynamic data and option updates", function () {
         const [network, data] = createNodeNetwork();
         const h = new HelperNode(network);
 
@@ -673,10 +656,10 @@ describe("Network Label", function () {
           { id: 4, font: { bold: { color: "orange" } } },
         ]);
 
-        assert.equal(h.modBold(0).color, "#343434"); // unchanged
-        assert.equal(h.modBold(1).color, "white"); // new group value
-        assert.equal(h.modBold(3).color, "green"); // unchanged
-        assert.equal(h.modBold(4).color, "orange"); // new local value
+        expect(h.modBold(0).color).to.equal("#343434"); // unchanged
+        expect(h.modBold(1).color).to.equal("white"); // new group value
+        expect(h.modBold(3).color).to.equal("green"); // unchanged
+        expect(h.modBold(4).color).to.equal("orange"); // new local value
 
         //
         // Change group options dynamically
@@ -689,11 +672,11 @@ describe("Network Label", function () {
           },
         });
 
-        assert.equal(h.modBold(0).color, "#343434"); // unchanged
-        assert.equal(h.modBold(1).color, "white"); // Unchanged
-        assert.equal(h.modBold(2).color, "brown"); // New group values
-        assert.equal(h.modBold(3).color, "green"); // unchanged
-        assert.equal(h.modBold(4).color, "orange"); // unchanged
+        expect(h.modBold(0).color).to.equal("#343434"); // unchanged
+        expect(h.modBold(1).color).to.equal("white"); // Unchanged
+        expect(h.modBold(2).color).to.equal("brown"); // New group values
+        expect(h.modBold(3).color).to.equal("green"); // unchanged
+        expect(h.modBold(4).color).to.equal("orange"); // unchanged
 
         network.setOptions({
           nodes: {
@@ -706,11 +689,11 @@ describe("Network Label", function () {
           },
         });
 
-        assert.equal(h.modBold(0).color, "black"); // nodes default
-        assert.equal(h.modBold(1).color, "black"); // more specific bold value overrides group value
-        assert.equal(h.modBold(2).color, "black"); // idem
-        assert.equal(h.modBold(3).color, "green"); // unchanged
-        assert.equal(h.modBold(4).color, "orange"); // unchanged
+        expect(h.modBold(0).color).to.equal("black"); // nodes default
+        expect(h.modBold(1).color).to.equal("black"); // more specific bold value overrides group value
+        expect(h.modBold(2).color).to.equal("black"); // idem
+        expect(h.modBold(3).color).to.equal("green"); // unchanged
+        expect(h.modBold(4).color).to.equal("orange"); // unchanged
 
         network.setOptions({
           groups: {
@@ -720,16 +703,14 @@ describe("Network Label", function () {
           },
         });
 
-        assert.equal(h.modBold(0).color, "black"); // nodes default
-        assert.equal(h.modBold(1).color, "black"); // more specific bold value overrides group value
-        assert.equal(h.modBold(2).color, "brown"); // bold group value overrides bold node value
-        assert.equal(h.modBold(3).color, "green"); // unchanged
-        assert.equal(h.modBold(4).color, "orange"); // unchanged
-
-        done();
+        expect(h.modBold(0).color).to.equal("black"); // nodes default
+        expect(h.modBold(1).color).to.equal("black"); // more specific bold value overrides group value
+        expect(h.modBold(2).color).to.equal("brown"); // bold group value overrides bold node value
+        expect(h.modBold(3).color).to.equal("green"); // unchanged
+        expect(h.modBold(4).color).to.equal("orange"); // unchanged
       });
 
-      it("handles normal font values in default options", function (done) {
+      it("handles normal font values in default options", function () {
         const newOptions = {
           nodes: {
             font: {
@@ -740,16 +721,14 @@ describe("Network Label", function () {
         const [network] = createNodeNetwork(newOptions);
         const h = new HelperNode(network);
 
-        assert.equal(h.modBold(0).color, "purple"); // Nodes value
-        assert.equal(h.modBold(1).color, "purple"); // Nodes value
-        assert.equal(h.modBold(2).color, "red"); // Group value overrides nodes
-        assert.equal(h.modBold(3).color, "green"); // Local value overrides all
-        assert.equal(h.modBold(4).color, "green"); // Idem
-
-        done();
+        expect(h.modBold(0).color).to.equal("purple"); // Nodes value
+        expect(h.modBold(1).color).to.equal("purple"); // Nodes value
+        expect(h.modBold(2).color).to.equal("red"); // Group value overrides nodes
+        expect(h.modBold(3).color).to.equal("green"); // Local value overrides all
+        expect(h.modBold(4).color).to.equal("green"); // Idem
       });
 
-      it("handles multi-font values in default options/groups", function (done) {
+      it("handles multi-font values in default options/groups", function () {
         const newOptions = {
           nodes: {
             font: {
@@ -767,15 +746,13 @@ describe("Network Label", function () {
 
         const [network, , options] = createNodeNetwork(newOptions);
         const h = new HelperNode(network);
-        assert(options.nodes.font.multi);
+        expect(options.nodes.font.multi).to.be.true;
 
-        assert.equal(h.modBold(0).color, "yellow"); // bold value
-        assert.equal(h.modBold(1).color, "yellow"); // bold value
-        assert.equal(h.modBold(2).color, "red"); // Group value overrides nodes
-        assert.equal(h.modBold(3).color, "green"); // Local value overrides all
-        assert.equal(h.modBold(4).color, "green"); // Idem
-
-        done();
+        expect(h.modBold(0).color).to.equal("yellow"); // bold value
+        expect(h.modBold(1).color).to.equal("yellow"); // bold value
+        expect(h.modBold(2).color).to.equal("red"); // Group value overrides nodes
+        expect(h.modBold(3).color).to.equal("green"); // Local value overrides all
+        expect(h.modBold(4).color).to.equal("green"); // Idem
       });
     }); // Node Labels
 
@@ -854,26 +831,24 @@ describe("Network Label", function () {
        * - using multi-font option 'color' for test, the rest should work analogously
        * - edges have no groups
        */
-      it("respects the font option precedence", function (done) {
+      it("respects the font option precedence", function () {
         const [network] = createEdgeNetwork();
         const h = new HelperEdge(network);
 
-        assert.equal(h.modBold(1).color, "#343434"); // Default value
-        assert.equal(h.modBold(2).color, "green"); // Local value overrides default
-        assert.equal(h.modBold(3).color, "green"); // Local value overrides group
-
-        done();
+        expect(h.modBold(1).color).to.equal("#343434"); // Default value
+        expect(h.modBold(2).color).to.equal("green"); // Local value overrides default
+        expect(h.modBold(3).color).to.equal("green"); // Local value overrides group
       });
 
-      it("handles dynamic data and option updates", function (done) {
+      it("handles dynamic data and option updates", function () {
         const [network, data] = createEdgeNetwork();
         const h = new HelperEdge(network);
 
         data.edges.update([{ id: 3, font: { bold: { color: "orange" } } }]);
 
-        assert.equal(h.modBold(1).color, "#343434"); // unchanged
-        assert.equal(h.modBold(2).color, "green"); // unchanged
-        assert.equal(h.modBold(3).color, "orange"); // new local value
+        expect(h.modBold(1).color).to.equal("#343434"); // unchanged
+        expect(h.modBold(2).color).to.equal("green"); // unchanged
+        expect(h.modBold(3).color).to.equal("orange"); // new local value
 
         network.setOptions({
           edges: {
@@ -886,14 +861,12 @@ describe("Network Label", function () {
           },
         });
 
-        assert.equal(h.modBold(1).color, "black"); // more specific bold value overrides group value
-        assert.equal(h.modBold(2).color, "green"); // unchanged
-        assert.equal(h.modBold(3).color, "orange"); // unchanged
-
-        done();
+        expect(h.modBold(1).color).to.equal("black"); // more specific bold value overrides group value
+        expect(h.modBold(2).color).to.equal("green"); // unchanged
+        expect(h.modBold(3).color).to.equal("orange"); // unchanged
       });
 
-      it("handles font values in default options", function (done) {
+      it("handles font values in default options", function () {
         const newOptions = {
           edges: {
             font: {
@@ -904,11 +877,9 @@ describe("Network Label", function () {
         const [network] = createEdgeNetwork(newOptions);
         const h = new HelperEdge(network);
 
-        assert.equal(h.modBold(1).color, "purple"); // Nodes value
-        assert.equal(h.modBold(2).color, "green"); // Local value overrides all
-        assert.equal(h.modBold(3).color, "green"); // Idem
-
-        done();
+        expect(h.modBold(1).color).to.equal("purple"); // Nodes value
+        expect(h.modBold(2).color).to.equal("green"); // Local value overrides all
+        expect(h.modBold(3).color).to.equal("green"); // Idem
       });
     }); // Edge Labels
 
@@ -929,7 +900,7 @@ describe("Network Label", function () {
         const expected = testFonts[expectedLabel];
 
         util.forEach(expected, (item, key) => {
-          assert.equal(opt[key], item);
+          expect(opt[key]).to.equal(item);
         });
       }
 
@@ -974,7 +945,7 @@ describe("Network Label", function () {
         return [network, data];
       }
 
-      it("handles shorthand options correctly", function (done) {
+      it("handles shorthand options correctly", function () {
         const [network] = createNetwork();
         const h = new HelperNode(network);
 
@@ -992,9 +963,9 @@ describe("Network Label", function () {
         checkFont(opt, "font3");
         checkFont(opt.bold, "font1"); // bold retains nodes default options
         checkFont(opt.ital, "font2"); // ital retains nodes default options
-        assert.equal(opt.mono.color, "#030303"); // New color
-        assert.equal(opt.mono.face, "monospace"); // own global default font
-        assert.equal(opt.mono.size, 15); // Own global default size
+        expect(opt.mono.color).to.equal("#030303"); // New color
+        expect(opt.mono.face).to.equal("monospace"); // own global default font
+        expect(opt.mono.size).to.equal(15); // Own global default size
 
         // Node 3 should be using group2 options
         opt = h.fontOption(3);
@@ -1008,11 +979,9 @@ describe("Network Label", function () {
         checkFont(opt, "font5");
         checkFont(opt.bold, "font1");
         checkFont(opt.ital, "font2");
-        assert.equal(opt.mono.color, "#050505"); // New color
-        assert.equal(opt.mono.face, "monospace");
-        assert.equal(opt.mono.size, 15);
-
-        done();
+        expect(opt.mono.color).to.equal("#050505"); // New color
+        expect(opt.mono.face).to.equal("monospace");
+        expect(opt.mono.size).to.equal(15);
       });
 
       function dynamicAdd1(network, data) {
@@ -1050,7 +1019,7 @@ describe("Network Label", function () {
         });
       }
 
-      it("deals with dynamic data and option updates for shorthand", function (done) {
+      it("deals with dynamic data and option updates for shorthand", function () {
         const [network, data] = createNetwork();
         const h = new HelperNode(network);
         dynamicAdd1(network, data);
@@ -1059,9 +1028,9 @@ describe("Network Label", function () {
         checkFont(opt, "font5"); // New base font
         checkFont(opt.bold, "font1");
         checkFont(opt.ital, "font4"); // New global node default
-        assert.equal(opt.mono.color, "#050505"); // New color
-        assert.equal(opt.mono.face, "monospace");
-        assert.equal(opt.mono.size, 15);
+        expect(opt.mono.color).to.equal("#050505"); // New color
+        expect(opt.mono.face).to.equal("monospace");
+        expect(opt.mono.size).to.equal(15);
 
         opt = h.fontOption(2);
         checkFont(opt, "default");
@@ -1073,21 +1042,19 @@ describe("Network Label", function () {
         checkFont(opt, "font6"); // New base font
         checkFont(opt.bold, "font1"); // group bold option removed, using global default node
         checkFont(opt.ital, "font4"); // New global node default
-        assert.equal(opt.mono.color, "#060606"); // New color
-        assert.equal(opt.mono.face, "monospace");
-        assert.equal(opt.mono.size, 15);
+        expect(opt.mono.color).to.equal("#060606"); // New color
+        expect(opt.mono.face).to.equal("monospace");
+        expect(opt.mono.size).to.equal(15);
 
         opt = h.fontOption(4);
         checkFont(opt, "default");
         checkFont(opt.bold, "font6");
         checkFont(opt.ital, "font4");
-        assert.equal(opt.mono.face, "monospace");
-        assert.equal(opt.mono.size, 15);
-
-        done();
+        expect(opt.mono.face).to.equal("monospace");
+        expect(opt.mono.size).to.equal(15);
       });
 
-      it("deals with dynamic change of global node default", function (done) {
+      it("deals with dynamic change of global node default", function () {
         const [network, data] = createNetwork();
         const h = new HelperNode(network);
         dynamicAdd1(network, data); // Accumulate data of dynamic add
@@ -1097,38 +1064,36 @@ describe("Network Label", function () {
         checkFont(opt, "font5"); // Node instance value
         checkFont(opt.bold, "font5"); // bold def removed from global default node
         checkFont(opt.ital, "font5"); // idem
-        assert.equal(opt.mono.color, "#050505"); // New color
-        assert.equal(opt.mono.face, "monospace");
-        assert.equal(opt.mono.size, 15);
+        expect(opt.mono.color).to.equal("#050505"); // New color
+        expect(opt.mono.face).to.equal("monospace");
+        expect(opt.mono.size).to.equal(15);
 
         opt = h.fontOption(2);
         checkFont(opt, "font7"); // global node default applies for all settings
         checkFont(opt.bold, "font7");
         checkFont(opt.ital, "font7");
-        assert.equal(opt.mono.color, "#070707");
-        assert.equal(opt.mono.face, "monospace");
-        assert.equal(opt.mono.size, 15);
+        expect(opt.mono.color).to.equal("#070707");
+        expect(opt.mono.face).to.equal("monospace");
+        expect(opt.mono.size).to.equal(15);
 
         opt = h.fontOption(3);
         checkFont(opt, "font6"); // Group base font
         checkFont(opt.bold, "font6"); // idem
         checkFont(opt.ital, "font6"); // idem
-        assert.equal(opt.mono.color, "#060606"); // idem
-        assert.equal(opt.mono.face, "monospace");
-        assert.equal(opt.mono.size, 15);
+        expect(opt.mono.color).to.equal("#060606"); // idem
+        expect(opt.mono.face).to.equal("monospace");
+        expect(opt.mono.size).to.equal(15);
 
         opt = h.fontOption(4);
         checkFont(opt, "font7"); // global node default
         checkFont(opt.bold, "font6"); // node instance bold
         checkFont(opt.ital, "font7"); // global node default
-        assert.equal(opt.mono.color, "#070707"); // idem
-        assert.equal(opt.mono.face, "monospace");
-        assert.equal(opt.mono.size, 15);
-
-        done();
+        expect(opt.mono.color).to.equal("#070707"); // idem
+        expect(opt.mono.face).to.equal("monospace");
+        expect(opt.mono.size).to.equal(15);
       });
 
-      it("deals with dynamic delete of shorthand options", function (done) {
+      it("deals with dynamic delete of shorthand options", function () {
         const [network, data] = createNetwork();
         const h = new HelperNode(network);
         dynamicAdd1(network, data); // Accumulate data of previous dynamic steps
@@ -1172,9 +1137,9 @@ describe("Network Label", function () {
           checkFont(opt, "font7");
           checkFont(opt.bold, "font7");
           checkFont(opt.ital, "font7");
-          assert.equal(opt.mono.color, "#070707");
-          assert.equal(opt.mono.face, "monospace");
-          assert.equal(opt.mono.size, 15);
+          expect(opt.mono.color).to.equal("#070707");
+          expect(opt.mono.face).to.equal("monospace");
+          expect(opt.mono.size).to.equal(15);
         }
 
         /*
@@ -1185,12 +1150,10 @@ describe("Network Label", function () {
       },
     });
 */
-
-        done();
       });
     }); // Shorthand Font Options
 
-    it("sets and uses font.multi in group options", function (done) {
+    it("sets and uses font.multi in group options", function () {
       /**
        * Helper function for easily accessing font options in a node
        * @param index
@@ -1257,10 +1220,10 @@ describe("Network Label", function () {
 
       const network = new Network(container, data, options);
 
-      assert.equal(modBold(1).color, "red"); // Group value
-      assert(fontOption(1).multi); // Group value
-      assert.equal(modBold(6).color, "blue"); // node instance value
-      assert(fontOption(6).multi); // Group value
+      expect(modBold(1).color).to.equal("red"); // Group value
+      expect(fontOption(1).multi).to.be.true; // Group value
+      expect(modBold(6).color).to.equal("blue"); // node instance value
+      expect(fontOption(6).multi).to.be.true; // Group value
 
       network.setOptions({
         groups: {
@@ -1274,10 +1237,10 @@ describe("Network Label", function () {
         },
       });
 
-      assert.equal(modBold(1).color, "brown"); // New value
-      assert(fontOption(1).multi); // Group value
-      assert.equal(modBold(6).color, "blue"); // unchanged
-      assert(fontOption(6).multi); // unchanged
+      expect(modBold(1).color).to.equal("brown"); // New value
+      expect(fontOption(1).multi).to.be.true; // Group value
+      expect(modBold(6).color).to.equal("blue"); // unchanged
+      expect(fontOption(6).multi).to.be.true; // unchanged
 
       network.setOptions({
         groups: {
@@ -1290,15 +1253,13 @@ describe("Network Label", function () {
       // console.log("===============");
       // console.log(fontOption(1));
 
-      assert.equal(modBold(1).color, "#343434"); // Reverts to default
-      assert(!fontOption(1).multi); // idem
-      assert.equal(modBold(6).color, "blue"); // unchanged
-      assert(fontOption(6).multi); // unchanged
-
-      done();
+      expect(modBold(1).color).to.equal("#343434"); // Reverts to default
+      expect(fontOption(1).multi).to.be.false; // idem
+      expect(modBold(6).color).to.equal("blue"); // unchanged
+      expect(fontOption(6).multi).to.be.true; // unchanged
     });
 
-    it("compresses spaces for Multi-Font", function (done) {
+    it("compresses spaces for Multi-Font", function () {
       let options = getOptions();
 
       const text = [
@@ -1487,15 +1448,13 @@ describe("Network Label", function () {
       ];
 
       checkProcessedLabels(label, text, expected_multifont_maxwidth);
-
-      done();
     });
   }); // Multi-Fonts
 
-  it("parses single huge word on line with preceding whitespace when max width set", function (done) {
+  it("parses single huge word on line with preceding whitespace when max width set", function () {
     const options = getOptions();
     options.font.maxWdt = 300;
-    assert.equal(options.font.multi, false);
+    expect(options.font.multi).to.be.false;
 
     /**
      * Split a string at the given location, return either first or last part
@@ -1589,8 +1548,6 @@ describe("Network Label", function () {
     options.font.multi = true;
     label = new Label({}, options);
     checkProcessedLabels(label, text, expected);
-
-    done();
   });
 
   /**
@@ -1600,7 +1557,7 @@ describe("Network Label", function () {
    *
    * NOTE: boolean shorthand values for widthConstraint and heightConstraint do nothing.
    */
-  it("Sets the width/height constraints in the font label options", function (done) {
+  it("Sets the width/height constraints in the font label options", function () {
     const nodes = [
       { id: 100, label: "node 100" },
       { id: 210, group: "group1", label: "node 210" },
@@ -1735,35 +1692,29 @@ describe("Network Label", function () {
     ];
 
     const assertConstraints = (expected, fontOptions, label) => {
-      assert.equal(
-        expected.minWdt,
+      expect(expected.minWdt).to.equal(
         fontOptions.minWdt,
-        "Incorrect min width" + label
+        "Incorrect min width" + label,
       );
-      assert.equal(
-        expected.maxWdt,
+      expect(expected.maxWdt).to.equal(
         fontOptions.maxWdt,
-        "Incorrect max width" + label
+        "Incorrect max width" + label,
       );
-      assert.equal(
-        expected.minHgt,
+      expect(expected.minHgt).to.equal(
         fontOptions.minHgt,
-        "Incorrect min height" + label
+        "Incorrect min height" + label,
       );
-      assert.equal(
-        expected.valign,
+      expect(expected.valign).to.equal(
         fontOptions.valign,
-        "Incorrect valign" + label
+        "Incorrect valign" + label,
       );
     };
 
     // Check nodes
     util.forEach(nodes_expected, function (expected) {
       const networkNode = network.body.nodes[expected.nodeId];
-      assert(
-        networkNode !== undefined && networkNode !== null,
-        "node not found for id: " + expected.nodeId
-      );
+      expect(networkNode, "node not found for id: " + expected.nodeId).to.not.be
+        .undefined.and.not.be.null;
       const fontOptions = networkNode.labelModule.fontOptions;
 
       const label = " for node id: " + expected.nodeId;
@@ -1775,33 +1726,31 @@ describe("Network Label", function () {
       const networkEdge = network.body.edges[expected.id];
 
       const label = " for edge id: " + expected.id;
-      assert(networkEdge !== undefined, "Edge not found" + label);
+      expect(networkEdge, "Edge not found" + label).to.not.be.undefined;
 
       const fontOptions = networkEdge.labelModule.fontOptions;
       assertConstraints(expected, fontOptions, label);
     });
-
-    done();
   });
 
-  it("deals with null labels and other awkward values", function (done) {
+  it("deals with null labels and other awkward values", function () {
     const ctx = new DummyContext();
     let options = getOptions({});
 
     const checkHandling = (label, index, text) => {
-      assert.doesNotThrow(() => {
+      expect(() => {
         label.getTextSize(ctx, false, false);
-      }, "Unexpected throw for " + text + " " + index);
+      }).to.not.throw("Unexpected throw for " + text + " " + index);
       //label.getTextSize(ctx, false, false);  // Use this to determine the error thrown
 
       // There should not be a label for any of the cases
       //
       const labelVal = label.elementOptions.label;
       const validLabel = typeof labelVal === "string" && labelVal !== "";
-      assert(
+      expect(
         !validLabel,
-        "Unexpected label value '" + labelVal + "' for " + text + " " + index
-      );
+        "Unexpected label value '" + labelVal + "' for " + text + " " + index,
+      ).to.be.true;
     };
 
     const nodes = [
@@ -1852,17 +1801,16 @@ describe("Network Label", function () {
 
     options = {};
     new Network(container, data, options);
-
-    done();
   });
 
   describe("visible function", function () {
-    it("correctly determines label is not visible when label is invalid", function (done) {
+    it("correctly determines label is not visible when label is invalid", function () {
       const invalidLabel = "";
-      assert(
-        !isValidLabel(invalidLabel),
-        "An empty string should be identified as an invalid label"
-      );
+      expect(
+        isValidLabel(invalidLabel),
+
+        "An empty string should be identified as an invalid label",
+      ).to.be.false;
 
       const body = {
         view: {
@@ -1886,12 +1834,10 @@ describe("Network Label", function () {
       label.size.width = 1;
       label.size.height = 1;
 
-      assert(
-        !label.visible(),
-        "Label should not be visible because the label text is invalid"
-      );
-
-      done();
+      expect(
+        label.visible(),
+        "Label should not be visible because the label text is invalid",
+      ).to.be.false;
     });
   });
 });

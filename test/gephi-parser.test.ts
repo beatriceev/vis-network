@@ -1,5 +1,9 @@
 import { expect } from "chai";
-import { ColorObject, VisData, parseGephi } from "../lib/network/gephiParser";
+import {
+  type ColorObject,
+  type VisData,
+  parseGephi,
+} from "../lib/network/gephiParser.ts";
 
 describe("Gephi parser", function (): void {
   it("Empty dataset", function (): void {
@@ -10,7 +14,7 @@ describe("Gephi parser", function (): void {
 
     expect(
       visData,
-      "Object with empty arrays should be returned"
+      "Object with empty arrays should be returned",
     ).to.deep.equal({
       nodes: [],
       edges: [],
@@ -29,7 +33,7 @@ describe("Gephi parser", function (): void {
 
     expect(
       visData,
-      "All properties should be present but no more than that"
+      "All properties should be present but no more than that",
     ).to.deep.equal({
       nodes: [
         {
@@ -62,7 +66,7 @@ describe("Gephi parser", function (): void {
 
     expect(
       visData,
-      "All properties should be present but no more than that"
+      "All properties should be present but no more than that",
     ).to.deep.equal({
       nodes: [
         {
@@ -122,7 +126,7 @@ describe("Gephi parser", function (): void {
 
     expect(
       visData,
-      "All properties should be present but no more than that"
+      "All properties should be present but no more than that",
     ).to.deep.equal({
       nodes: [
         {
@@ -156,19 +160,19 @@ describe("Gephi parser", function (): void {
 
     expect(
       visData.nodes[0].attributes,
-      "Attributes object should be copyied as is"
+      "Attributes object should be copyied as is",
     ).to.equal(fromAttrs);
     expect(
       visData.nodes[1].attributes,
-      "Attributes object should be copyied as is"
+      "Attributes object should be copyied as is",
     ).to.equal(toAttrs);
     expect(
       visData.edges[0].attributes,
-      "Attributes object should be copyied as is"
+      "Attributes object should be copyied as is",
     ).to.equal(fromAttrs);
     expect(
       visData.edges[1].attributes,
-      "Attributes object should be copyied as is"
+      "Attributes object should be copyied as is",
     ).to.equal(toAttrs);
   });
 
@@ -189,7 +193,7 @@ describe("Gephi parser", function (): void {
 
     expect(
       visData,
-      "All properties should be present but no more than that"
+      "All properties should be present but no more than that",
     ).to.deep.equal({
       nodes: [
         {
@@ -222,7 +226,7 @@ describe("Gephi parser", function (): void {
 
     expect(
       visData,
-      "All properties should be present but no more than that"
+      "All properties should be present but no more than that",
     ).to.deep.equal({
       nodes: [],
       edges: [
@@ -269,7 +273,7 @@ describe("Gephi parser", function (): void {
           ],
           edges: [],
         },
-        { fixed: false }
+        { fixed: false },
       );
 
       expect(visData, "False if false").to.deep.equal({
@@ -301,12 +305,12 @@ describe("Gephi parser", function (): void {
           ],
           edges: [],
         },
-        { fixed: true }
+        { fixed: true },
       );
 
       expect(
         visData,
-        "False if no or incomplete position is available"
+        "False if no or incomplete position is available",
       ).to.deep.equal({
         nodes: [
           {
@@ -340,7 +344,7 @@ describe("Gephi parser", function (): void {
           ],
           edges: [],
         },
-        { fixed: true }
+        { fixed: true },
       );
 
       expect(visData, "True if complete position is available").to.deep.equal({
@@ -406,12 +410,12 @@ describe("Gephi parser", function (): void {
           ],
           edges: [],
         },
-        { parseColor: false }
+        { parseColor: false },
       );
 
       expect(
         visData,
-        "Expanded to an object if parseColor is false"
+        "Expanded to an object if parseColor is false",
       ).to.deep.equal({
         nodes: [
           {
@@ -435,7 +439,7 @@ describe("Gephi parser", function (): void {
           ],
           edges: [],
         },
-        { parseColor: true }
+        { parseColor: true },
       );
 
       expect(visData, "Left as a string if parseColor is true").to.deep.equal({
@@ -529,7 +533,7 @@ describe("Gephi parser", function (): void {
             },
           ],
         },
-        { inheritColor: false }
+        { inheritColor: false },
       );
 
       expect(visData, "Color should be used if present").to.deep.equal({
@@ -584,7 +588,7 @@ describe("Gephi parser", function (): void {
             },
           ],
         },
-        { inheritColor: true }
+        { inheritColor: true },
       );
 
       expect(visData, "Color should be ignored event if present").to.deep.equal(
@@ -611,7 +615,7 @@ describe("Gephi parser", function (): void {
               to: "to",
             },
           ],
-        }
+        },
       );
     });
   });

@@ -1,5 +1,5 @@
-import { BezierEdgeBase } from "./util/bezier-edge-base";
-import {
+import { BezierEdgeBase } from "./util/bezier-edge-base.ts";
+import type {
   EdgeFormattingValues,
   Label,
   EdgeOptions,
@@ -8,7 +8,7 @@ import {
   SelectiveRequired,
   VBody,
   VNode,
-} from "./util/types";
+} from "./util/types.ts";
 
 /**
  * A Static Bezier Edge. Bezier curves are used to model smooth gradual curves in paths between nodes.
@@ -36,7 +36,7 @@ export class BezierEdgeStatic extends BezierEdgeBase<Point> {
       | "shadowX"
       | "shadowY"
     >,
-    viaNode: Point
+    viaNode: Point,
   ): void {
     this._bezierCurve(ctx, values, viaNode);
   }
@@ -198,7 +198,7 @@ export class BezierEdgeStatic extends BezierEdgeBase<Point> {
   protected _findBorderPosition(
     nearNode: VNode,
     ctx: CanvasRenderingContext2D,
-    options: { via?: Point } = {}
+    options: { via?: Point } = {},
   ): PointT {
     return this._findBorderPositionBezier(nearNode, ctx, options.via);
   }
@@ -211,7 +211,7 @@ export class BezierEdgeStatic extends BezierEdgeBase<Point> {
     y2: number,
     x3: number,
     y3: number,
-    viaNode = this._getViaCoordinates()
+    viaNode = this._getViaCoordinates(),
   ) {
     // x3,y3 is the point
     return this._getDistanceToBezierEdge(x1, y1, x2, y2, x3, y3, viaNode);
@@ -220,7 +220,7 @@ export class BezierEdgeStatic extends BezierEdgeBase<Point> {
   /** @inheritDoc */
   public getPoint(
     position: number,
-    viaNode: Point = this._getViaCoordinates()
+    viaNode: Point = this._getViaCoordinates(),
   ): Point {
     const t = position;
     const x =

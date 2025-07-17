@@ -1,11 +1,19 @@
 // Network.
-export * from "./network/Network";
+import "./network/modules/ManipulationSystem.css";
+import "./network/modules/components/NavigationHandler.css";
+import "vis-util/esnext/styles/activator.css";
+import "vis-util/esnext/styles/bootstrap.css";
+import "vis-util/esnext/styles/color-picker.css";
+import "vis-util/esnext/styles/configurator.css";
+import "vis-util/esnext/styles/popup.css";
 
-import Images from "./network/Images";
-import * as dotparser from "./network/dotparser";
-import * as gephiParser from "./network/gephiParser";
-import { parseGephi } from "./network/gephiParser";
-import * as allOptions from "./network/options";
+export * from "./network/Network.js";
+
+import Images from "./network/Images.js";
+import * as dotparser from "./network/dotparser.js";
+import * as gephiParser from "./network/gephiParser.js";
+import { parseGephi } from "./network/gephiParser.js";
+import * as allOptions from "./network/options.js";
 export const network = {
   Images,
   dotparser,
@@ -16,7 +24,7 @@ export const network = {
 };
 
 // utils
-import * as DOMutil from "./DOMutil";
+import * as DOMutil from "./DOMutil.js";
 export { DOMutil };
 
 // vis-util

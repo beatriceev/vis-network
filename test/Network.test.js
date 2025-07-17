@@ -11,11 +11,11 @@
  *   }
  */
 import fs from "fs";
-import assert from "assert";
+import { expect } from "chai";
 import { DataSet } from "vis-data/esnext";
-import Network from "../lib/network/Network";
-import { canvasMockify } from "./canvas-mock";
-import { allOptions, configureOptions } from "../lib/network/options";
+import Network from "../lib/network/Network.js";
+import { canvasMockify } from "./canvas-mock.js";
+import { allOptions, configureOptions } from "../lib/network/options.ts";
 
 /**
  * Merge all options of object b into object b
@@ -155,15 +155,13 @@ function log(network) {
 function assertNumNodes(network, expectedPresent, expectedVisible) {
   if (expectedVisible === undefined) expectedVisible = expectedPresent;
 
-  assert.equal(
-    Object.keys(network.body.nodes).length,
+  expect(Object.keys(network.body.nodes).length).to.equal(
     expectedPresent,
-    "Total number of nodes does not match"
+    "Total number of nodes does not match",
   );
-  assert.equal(
-    network.body.nodeIndices.length,
+  expect(network.body.nodeIndices.length).to.equal(
     expectedVisible,
-    "Number of visible nodes does not match"
+    "Number of visible nodes does not match",
   );
 }
 
@@ -173,15 +171,13 @@ function assertNumNodes(network, expectedPresent, expectedVisible) {
 function assertNumEdges(network, expectedPresent, expectedVisible) {
   if (expectedVisible === undefined) expectedVisible = expectedPresent;
 
-  assert.equal(
-    Object.keys(network.body.edges).length,
+  expect(Object.keys(network.body.edges).length).to.equal(
     expectedPresent,
-    "Total number of edges does not match"
+    "Total number of edges does not match",
   );
-  assert.equal(
-    network.body.edgeIndices.length,
+  expect(network.body.edgeIndices.length).to.equal(
     expectedVisible,
-    "Number of visible edges does not match"
+    "Number of visible edges does not match",
   );
 }
 
@@ -193,11 +189,10 @@ function assertEdgeLabels(network, originalEdgesDataSet, assertMessagePrefix) {
     const expectedOriginalEdge = originalEdgesDataSet.get(id);
     const currentNetworkEdge = network.body.edges[id];
 
-    assert.equal(
-      currentNetworkEdge.options.label,
+    expect(currentNetworkEdge.options.label).to.equal(
       expectedOriginalEdge.label,
       assertMessagePrefix +
-        " - current edge labels do not match the original edge labels"
+        " - current edge labels do not match the original edge labels",
     );
   }
 }
@@ -230,9 +225,9 @@ function checkFontProperties(fontItem, checkStrict = true) {
   for (const prop in fontItem) {
     if (prop === "__type__") continue; // Skip special field in options definition
     if (!Object.prototype.hasOwnProperty.call(fontItem, prop)) continue;
-    assert(
-      knownProperties.indexOf(prop) !== -1,
-      "Unknown font option '" + prop + "'"
+    expect(knownProperties).to.include(
+      prop,
+      "Unknown font option '" + prop + "'",
     );
   }
 
@@ -242,10 +237,7 @@ function checkFontProperties(fontItem, checkStrict = true) {
   const keys = Object.keys(fontItem);
   for (const n in knownProperties) {
     const prop = knownProperties[n];
-    assert(
-      keys.indexOf(prop) !== -1,
-      "Missing known font option '" + prop + "'"
-    );
+    expect(keys).to.include(prop, "Missing known font option '" + prop + "'");
   }
 }
 
@@ -290,15 +282,15 @@ describe("Network", function () {
 
   function checkChooserValues(item, chooser, labelChooser) {
     if (chooser === "function") {
-      assert.equal(typeof item.chooser, "function");
+      expect(item.chooser).to.be.a("function");
     } else {
-      assert.equal(item.chooser, chooser);
+      expect(item.chooser).to.equal(chooser);
     }
 
     if (labelChooser === "function") {
-      assert.equal(typeof item.labelModule.fontOptions.chooser, "function");
+      expect(item.labelModule.fontOptions.chooser).to.be.a("function");
     } else {
-      assert.equal(item.labelModule.fontOptions.chooser, labelChooser);
+      expect(item.labelModule.fontOptions.chooser).to.equal(labelChooser);
     }
   }
 
@@ -331,7 +323,7 @@ describe("Network", function () {
    * At time of writing, this test detected 22 out of 33 'illegal' loops.
    * The real deterrent is eslint rule 'guard-for-in`.
    */
-  it("can deal with added fields in Array.prototype", function (done) {
+  it("can deal with added fields in Array.prototype", function () {
     window.document.createElement("canvas");
     Array.prototype.foo = 1; // Just add anything to the prototype
     Object.prototype.bar = 2; // Let's screw up hashes as well
@@ -351,12 +343,11 @@ describe("Network", function () {
     } catch (e) {
       delete Array.prototype.foo; // Remove it again so as not to confuse other tests.
       delete Object.prototype.bar;
-      assert(false, "Got exception:\n" + e.stack);
+      expect.fail("Got exception:\n" + e.stack);
     }
 
     delete Array.prototype.foo; // Remove it again so as not to confuse other tests.
     delete Object.prototype.bar;
-    done();
   });
 
   /**
@@ -371,9 +362,10 @@ describe("Network", function () {
 
     // options should still be empty
     for (const prop in options) {
-      assert(
-        !Object.prototype.hasOwnProperty.call(options, prop),
-        "No properties should be present in options, detected property: " + prop
+      expect(options).to.not.have.property(
+        prop,
+        "No properties should be present in options, detected property: " +
+          prop,
       );
     }
   });
@@ -563,38 +555,37 @@ describe("Network", function () {
       // Test passing options on init.
       let network = new Network(container, data, options);
       let edges = network.body.edges;
-      assert.equal(edges[1].options.color.inherit, "to"); // new default
-      assert.equal(edges[2].options.color.inherit, "to"); // set in edge
-      assert.equal(edges[3].options.color.inherit, false); // has explicit color
-      assert.equal(edges[4].options.color.inherit, "from"); // set in edge
+      expect(edges[1].options.color.inherit).to.equal("to"); // new default
+      expect(edges[2].options.color.inherit).to.equal("to"); // set in edge
+      expect(edges[3].options.color.inherit).to.equal(false); // has explicit color
+      expect(edges[4].options.color.inherit).to.equal("from"); // set in edge
 
       // Sanity check: colors should still be defaults
-      assert.equal(
-        edges[1].options.color.color,
-        network.edgesHandler.options.color.color
+      expect(edges[1].options.color.color).to.equal(
+        network.edgesHandler.options.color.color,
       );
 
       // Override the color value - inherit returns to default
       network.setOptions({ edges: { color: {} } });
-      assert.equal(edges[1].options.color.inherit, "from"); // default
-      assert.equal(edges[2].options.color.inherit, "to"); // set in edge
-      assert.equal(edges[3].options.color.inherit, false); // has explicit color
-      assert.equal(edges[4].options.color.inherit, "from"); // set in edge
+      expect(edges[1].options.color.inherit).to.equal("from"); // default
+      expect(edges[2].options.color.inherit).to.equal("to"); // set in edge
+      expect(edges[3].options.color.inherit).to.equal(false); // has explicit color
+      expect(edges[4].options.color.inherit).to.equal("from"); // set in edge
 
       // Check no options
       network = new Network(container, data, {});
       edges = network.body.edges;
-      assert.equal(edges[1].options.color.inherit, "from"); // default
-      assert.equal(edges[2].options.color.inherit, "to"); // set in edge
-      assert.equal(edges[3].options.color.inherit, false); // has explicit color
-      assert.equal(edges[4].options.color.inherit, "from"); // set in edge
+      expect(edges[1].options.color.inherit).to.equal("from"); // default
+      expect(edges[2].options.color.inherit).to.equal("to"); // set in edge
+      expect(edges[3].options.color.inherit).to.equal(false); // has explicit color
+      expect(edges[4].options.color.inherit).to.equal("from"); // set in edge
 
       // Set new value
       network.setOptions(options);
-      assert.equal(edges[1].options.color.inherit, "to");
-      assert.equal(edges[2].options.color.inherit, "to"); // set in edge
-      assert.equal(edges[3].options.color.inherit, false); // has explicit color
-      assert.equal(edges[4].options.color.inherit, "from"); // set in edge
+      expect(edges[1].options.color.inherit).to.equal("to");
+      expect(edges[2].options.color.inherit).to.equal("to"); // set in edge
+      expect(edges[3].options.color.inherit).to.equal(false); // has explicit color
+      expect(edges[4].options.color.inherit).to.equal("from"); // set in edge
 
       /*
     // Useful for debugging
@@ -614,17 +605,17 @@ describe("Network", function () {
       // Check no options
       const network = new Network(container, data, {});
       const edges = network.body.edges;
-      assert.equal(edges[1].options.color.inherit, "from"); // default
-      assert.equal(edges[2].options.color.inherit, "to"); // set in edge
-      assert.equal(edges[3].options.color.inherit, false); // has explicit color
-      assert.equal(edges[4].options.color.inherit, "from"); // set in edge
+      expect(edges[1].options.color.inherit).to.equal("from"); // default
+      expect(edges[2].options.color.inherit).to.equal("to"); // set in edge
+      expect(edges[3].options.color.inherit).to.equal(false); // has explicit color
+      expect(edges[4].options.color.inherit).to.equal("from"); // set in edge
 
       // Set new value
       data.edges.update({ id: 1, color: { inherit: "to" } });
-      assert.equal(edges[1].options.color.inherit, "to"); // Only this changed
-      assert.equal(edges[2].options.color.inherit, "to");
-      assert.equal(edges[3].options.color.inherit, false); // has explicit color
-      assert.equal(edges[4].options.color.inherit, "from");
+      expect(edges[1].options.color.inherit).to.equal("to"); // Only this changed
+      expect(edges[2].options.color.inherit).to.equal("to");
+      expect(edges[3].options.color.inherit).to.equal(false); // has explicit color
+      expect(edges[4].options.color.inherit).to.equal("from");
     });
 
     /**
@@ -644,46 +635,46 @@ describe("Network", function () {
       // Test passing options on init.
       let network = new Network(container, data, options);
       let edges = network.body.edges;
-      assert.equal(edges[1].options.color.color, color);
-      assert.equal(edges[1].options.color.inherit, false); // Explicit color, so no inherit
-      assert.equal(edges[2].options.color.color, color);
-      assert.equal(edges[2].options.color.inherit, "to"); // Local value overrides! (bug according to docs)
-      assert.notEqual(edges[3].options.color.color, color); // Has own value
-      assert.equal(edges[3].options.color.inherit, false); // Explicit color, so no inherit
-      assert.equal(edges[4].options.color.color, color);
+      expect(edges[1].options.color.color).to.equal(color);
+      expect(edges[1].options.color.inherit).to.equal(false); // Explicit color, so no inherit
+      expect(edges[2].options.color.color).to.equal(color);
+      expect(edges[2].options.color.inherit).to.equal("to"); // Local value overrides! (bug according to docs)
+      expect(edges[3].options.color.color).to.not.equal(color); // Has own value
+      expect(edges[3].options.color.inherit).to.equal(false); // Explicit color, so no inherit
+      expect(edges[4].options.color.color).to.equal(color);
 
       // Override the color value - all should return to default
       network.setOptions({ edges: { color: {} } });
-      assert.equal(edges[1].options.color.color, defaultColor);
-      assert.equal(edges[1].options.color.inherit, "from");
-      assert.equal(edges[2].options.color.color, defaultColor);
-      assert.notEqual(edges[3].options.color.color, color); // Has own value
-      assert.equal(edges[4].options.color.color, defaultColor);
+      expect(edges[1].options.color.color).to.equal(defaultColor);
+      expect(edges[1].options.color.inherit).to.equal("from");
+      expect(edges[2].options.color.color).to.equal(defaultColor);
+      expect(edges[3].options.color.color).to.not.equal(color); // Has own value
+      expect(edges[4].options.color.color).to.equal(defaultColor);
 
       // Check no options
       network = new Network(container, data, {});
       edges = network.body.edges;
       // At this point, color has not changed yet
-      assert.equal(edges[1].options.color.color, defaultColor);
-      assert.equal(edges[1].options.color.highlight, defaultColor);
-      assert.equal(edges[1].options.color.inherit, "from");
-      assert.notEqual(edges[3].options.color.color, color); // Has own value
+      expect(edges[1].options.color.color).to.equal(defaultColor);
+      expect(edges[1].options.color.highlight).to.equal(defaultColor);
+      expect(edges[1].options.color.inherit).to.equal("from");
+      expect(edges[3].options.color.color).to.not.equal(color); // Has own value
 
       // Set new Value
       network.setOptions(options);
-      assert.equal(edges[1].options.color.color, color);
-      assert.equal(edges[1].options.color.highlight, defaultColor); // Should not be changed
-      assert.equal(edges[1].options.color.inherit, false); // Explicit color, so no inherit
-      assert.equal(edges[2].options.color.color, color);
-      assert.notEqual(edges[3].options.color.color, color); // Has own value
-      assert.equal(edges[4].options.color.color, color);
+      expect(edges[1].options.color.color).to.equal(color);
+      expect(edges[1].options.color.highlight).to.equal(defaultColor); // Should not be changed
+      expect(edges[1].options.color.inherit).to.equal(false); // Explicit color, so no inherit
+      expect(edges[2].options.color.color).to.equal(color);
+      expect(edges[3].options.color.color).to.not.equal(color); // Has own value
+      expect(edges[4].options.color.color).to.equal(color);
     });
 
     /**
      * Unit test for fix of #3500
      * Checking to make sure edges that become unconnected due to node removal get reconnected
      */
-    it.skip("has reconnected edges (problems since mocha 4)", function (done) {
+    it.skip("has reconnected edges (problems since mocha 4)", function () {
       const node1 = { id: 1, label: "test1" };
       const node2 = { id: 2, label: "test2" };
       const nodes = new DataSet([node1, node2]);
@@ -704,19 +695,22 @@ describe("Network", function () {
 
       let foundEdge = network.body.edges[edge.id];
 
-      assert.ok(foundEdge === undefined, "edge is still in state cache");
+      expect(foundEdge, "edge is still in state cache").to.be.undefined;
 
       //add node back reconnecting edge
       nodes.add(node2);
 
       foundEdge = network.body.edges[edge.id];
 
-      assert.ok(foundEdge !== undefined, "edge is missing from state cache");
-      done();
+      expect(foundEdge, "edge is missing from state cache").to.not.be.undefined;
     });
   }); // Edge
 
-  describe("Clustering", function () {
+  describe.only("Clustering", function () {
+    afterEach(async () => {
+      await new Promise((resolve) => void setTimeout(resolve, 1_000));
+    });
+
     it("properly handles options allowSingleNodeCluster", function () {
       const sampleNetwork = createSampleNetwork();
       const [network, data] = sampleNetwork;
@@ -736,7 +730,7 @@ describe("Network", function () {
       clusterTo(network, "c2", [14]);
       assertNumNodes(network, numNodes, numNodes - 2); // Nothing changed
       assertNumEdges(network, numEdges, numEdges - 2);
-      assert(network.body.nodes["c2"] === undefined); // Cluster not created
+      expect(network.body.nodes["c2"]).to.be.undefined; // Cluster not created
 
       // Redo with allowSingleNodeCluster == true
       clusterTo(network, "c2", [14], true);
@@ -744,7 +738,7 @@ describe("Network", function () {
       numEdges += 1;
       assertNumNodes(network, numNodes, numNodes - 3);
       assertNumEdges(network, numEdges, numEdges - 3);
-      assert(network.body.nodes["c2"] !== undefined); // Cluster created
+      expect(network.body.nodes["c2"]).to.not.be.undefined; // Cluster created
 
       // allowSingleNodeCluster: true with two nodes
       // removing one clustered node should retain cluster
@@ -755,7 +749,7 @@ describe("Network", function () {
       assertNumEdges(network, numEdges, 5);
 
       data.nodes.remove(12);
-      assert(network.body.nodes["c3"] !== undefined); // Cluster should still be present
+      expect(network.body.nodes["c3"]).to.not.be.undefined; // Cluster should still be present
       numNodes -= 1; // removed node
       numEdges -= 3; // cluster edge C3-13 should be removed
       assertNumNodes(network, numNodes, 6);
@@ -774,9 +768,9 @@ describe("Network", function () {
       numEdges += 3;
       assertNumNodes(network, numNodes, numNodes - 3);
       assertNumEdges(network, numEdges, numEdges - 3);
-      assert(network.body.nodes["c1"] !== undefined);
-      assert(network.body.nodes["c2"] !== undefined);
-      assert(network.body.nodes["c3"] !== undefined);
+      expect(network.body.nodes["c1"]).to.not.be.undefined;
+      expect(network.body.nodes["c2"]).to.not.be.undefined;
+      expect(network.body.nodes["c3"]).to.not.be.undefined;
 
       // The whole chain should be removed when the bottom-most node is deleted
       data.nodes.remove(4);
@@ -784,9 +778,9 @@ describe("Network", function () {
       numEdges -= 4;
       assertNumNodes(network, numNodes);
       assertNumEdges(network, numEdges);
-      assert(network.body.nodes["c1"] === undefined);
-      assert(network.body.nodes["c2"] === undefined);
-      assert(network.body.nodes["c3"] === undefined);
+      expect(network.body.nodes["c1"]).to.be.undefined;
+      expect(network.body.nodes["c2"]).to.be.undefined;
+      expect(network.body.nodes["c3"]).to.be.undefined;
     });
 
     /**
@@ -1002,14 +996,14 @@ describe("Network", function () {
         const recieved = collectClusters(network);
         //console.log(recieved);
 
-        assert(
+        expect(
           compareClusterInfo(recieved, expected),
           "recieved:" +
             JSON.stringify(recieved) +
             "; " +
             "expected: " +
-            JSON.stringify(expected)
-        );
+            JSON.stringify(expected),
+        ).to.be.true;
       };
 
       // Should cluster none:
@@ -1150,7 +1144,7 @@ describe("Network", function () {
       assertEdgeLabels(
         network,
         data.edges,
-        "c1(14-13-12-11 1-2-3-4) cluster opened"
+        "c1(14-13-12-11 1-2-3-4) cluster opened",
       );
 
       // One external connection
@@ -1192,7 +1186,7 @@ describe("Network", function () {
       assertEdgeLabels(
         network,
         data.edges,
-        "c1(1-2) c2(3-4) c1 cluster opened"
+        "c1(1-2) c2(3-4) c1 cluster opened",
       );
 
       clusterTo(network, "c1", [1, 2]);
@@ -1220,7 +1214,7 @@ describe("Network", function () {
       assertEdgeLabels(
         network,
         data.edges,
-        "14-13-c3(-12-11-)-1-2-c2(-3-4) c1 cluster opened"
+        "14-13-c3(-12-11-)-1-2-c2(-3-4) c1 cluster opened",
       );
     });
 
@@ -1315,7 +1309,7 @@ describe("Network", function () {
       assertEdgeLabels(
         network,
         data.edges,
-        "One external connection c2 middle clustered cluster opened"
+        "One external connection c2 middle clustered cluster opened",
       );
 
       // Open the top cluster
@@ -1336,20 +1330,20 @@ describe("Network", function () {
       assertEdgeLabels(
         network,
         data.edges,
-        "One external connection c3 top clustered cluster opened"
+        "One external connection c3 top clustered cluster opened",
       );
     });
   }); // Clustering
 
   describe("on node.js", function () {
     it("should be running", function () {
-      assert(this.container !== null, "Container div not found");
+      expect(this.container, "Container div not found").to.not.be.null; // Container div not found
 
       // The following should now just plain succeed
       const [network] = createSampleNetwork();
 
-      assert.equal(Object.keys(network.body.nodes).length, 8);
-      assert.equal(Object.keys(network.body.edges).length, 6);
+      expect(Object.keys(network.body.nodes)).to.have.lengthOf(8);
+      expect(Object.keys(network.body.edges)).to.have.lengthOf(6);
     });
 
     describe("runs example ", function () {
@@ -1382,36 +1376,35 @@ describe("Network", function () {
         //console.log(Object.keys(network.body.edges));
 
         // Count in following also contains the helper nodes for dynamic edges
-        assert.equal(Object.keys(network.body.nodes).length, 10);
-        assert.equal(Object.keys(network.body.edges).length, 5);
+        expect(Object.keys(network.body.nodes)).to.have.lengthOf(10);
+        expect(Object.keys(network.body.edges)).to.have.lengthOf(5);
       });
 
-      it("WorlCup2014", function (done) {
+      it("WorlCup2014", function () {
         // This is a huge example (which is why it's tested here!), so it takes a long time to load.
         this.timeout(15000);
 
         const network = loadExample(
           "./examples/network/datasources/WorldCup2014.js",
-          true
+          true,
         );
 
         // Count in following also contains the helper nodes for dynamic edges
-        assert.equal(Object.keys(network.body.nodes).length, 9964);
-        assert.equal(Object.keys(network.body.edges).length, 9228);
-        done();
+        expect(Object.keys(network.body.nodes)).to.have.lengthOf(9964);
+        expect(Object.keys(network.body.edges)).to.have.lengthOf(9228);
       });
 
       // This actually failed to load, added for this reason
       it.skip("disassemblerExample (problems since mocha 4)", function () {
         const network = loadExample(
-          "./examples/network/exampleApplications/disassemblerExample.js"
+          "./examples/network/exampleApplications/disassemblerExample.js",
         );
         // console.log(Object.keys(network.body.nodes));
         // console.log(Object.keys(network.body.edges));
 
         // Count in following also contains the helper nodes for dynamic edges
-        assert.equal(Object.keys(network.body.nodes).length, 9);
-        assert.equal(Object.keys(network.body.edges).length, 14 - 3); // NB 3 edges in data not displayed
+        expect(Object.keys(network.body.nodes)).to.have.lengthOf(9);
+        expect(Object.keys(network.body.edges)).to.have.lengthOf(14 - 3); // NB 3 edges in data not displayed
       });
     }); // runs example
   }); // on node.js

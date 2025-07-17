@@ -1,5 +1,5 @@
-import { BezierEdgeBase } from "./util/bezier-edge-base";
-import {
+import { BezierEdgeBase } from "./util/bezier-edge-base.ts";
+import type {
   EdgeFormattingValues,
   Label,
   EdgeOptions,
@@ -8,7 +8,7 @@ import {
   SelectiveRequired,
   VBody,
   VNode,
-} from "./util/types";
+} from "./util/types.ts";
 
 /**
  * A Dynamic Bezier Edge. Bezier curves are used to model smooth gradual
@@ -17,7 +17,8 @@ import {
  * @augments BezierEdgeBase
  */
 export class BezierEdgeDynamic extends BezierEdgeBase<Point> {
-  public via: VNode = this.via; // constructor → super → super → setOptions → setupSupportNode
+  // @ts-expect-error constructor → super → super → setOptions → setupSupportNode
+  public via: VNode = this.via;
   private readonly _boundFunction: () => void;
 
   /**
@@ -147,7 +148,7 @@ export class BezierEdgeDynamic extends BezierEdgeBase<Point> {
       | "shadowX"
       | "shadowY"
     >,
-    viaNode: VNode
+    viaNode: VNode,
   ): void {
     this._bezierCurve(ctx, values, viaNode);
   }
@@ -188,7 +189,7 @@ export class BezierEdgeDynamic extends BezierEdgeBase<Point> {
   /** @inheritDoc */
   protected _findBorderPosition(
     nearNode: VNode,
-    ctx: CanvasRenderingContext2D
+    ctx: CanvasRenderingContext2D,
   ): PointT {
     return this._findBorderPositionBezier(nearNode, ctx, this.via);
   }
@@ -200,7 +201,7 @@ export class BezierEdgeDynamic extends BezierEdgeBase<Point> {
     x2: number,
     y2: number,
     x3: number,
-    y3: number
+    y3: number,
   ): number {
     // x3,y3 is the point
     return this._getDistanceToBezierEdge(x1, y1, x2, y2, x3, y3, this.via);

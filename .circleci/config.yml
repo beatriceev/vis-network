@@ -3,7 +3,7 @@ version: 2.1
 executors:
   node:
     docker:
-      - image: cimg/node:21.7.3
+      - image: cimg/node:24.4.0
     resource_class: medium
     working_directory: ~/repo
     environment:
@@ -14,7 +14,7 @@ executors:
 
   node-browsers:
     docker:
-      - image: cimg/node:21.7.3-browsers
+      - image: cimg/node:24.4.0-browsers
     resource_class: medium
     working_directory: ~/repo
     environment:
@@ -35,8 +35,8 @@ jobs:
       - persist_to_workspace:
           root: ..
           paths:
+            - ".cache"
             - "repo"
-            - ".cache/Cypress"
 
   build:
     executor: node
@@ -131,7 +131,7 @@ jobs:
             npx gh-pages \
               --dist . \
               --message "chore: update to $(git rev-parse HEAD) [ci skip]" \
-              --repo "$(node -e 'process.stdout.write(require("./package.json").repository.url)')" \
+              --repo "$(node -e 'process.stdout.write(require("./package.json").repository.url.replace(/^git\+https:\/\//, "https://"))')" \
               --src "{{common-docs-files,coverage,docs,docs-kr,examples,$(node -e 'process.stdout.write(require("./package.json").files.join(","))')}/**/*,*.{html,md}}"
 
   release:

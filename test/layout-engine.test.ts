@@ -1,13 +1,13 @@
 import { expect } from "chai";
 import { spy } from "sinon";
 
-import LayoutEngine from "../lib/network/modules/LayoutEngine";
+import LayoutEngine from "../lib/network/modules/LayoutEngine.js";
 
 describe("LayoutEngine", function (): void {
   describe("setupHierarchicalLayout", function (): void {
     const generateTree = (
       edgeConnections: { from: number; to: number }[],
-      nodeIds: number[] = []
+      nodeIds: number[] = [],
     ): any => {
       const nodes: Record<number, any> = {};
       const edges: Record<number, any> = {};
@@ -340,7 +340,7 @@ describe("LayoutEngine", function (): void {
                   sortMethod: "directed",
                 },
               },
-              {}
+              {},
             );
 
             le.setupHierarchicalLayout();
@@ -389,7 +389,7 @@ describe("LayoutEngine", function (): void {
                   sortMethod: "directed",
                 },
               },
-              {}
+              {},
             );
 
             le.setupHierarchicalLayout();

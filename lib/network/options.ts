@@ -1,4 +1,4 @@
-import {
+import type {
   ConfiguratorConfig,
   ConfiguratorHideOption,
   OptionsConfig,
@@ -829,7 +829,7 @@ const configureOptions: ConfiguratorConfig = {
 export const configuratorHideOption: ConfiguratorHideOption = (
   parentPath,
   optionName,
-  options
+  options,
 ): boolean => {
   if (
     parentPath.includes("physics") &&

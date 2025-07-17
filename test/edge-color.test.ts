@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import Edge from "../lib/network/modules/components/Edge";
+import Edge from "../lib/network/modules/components/Edge.js";
 
 describe("Edge color", function (): void {
   const setOptions = Edge.prototype.setOptions;
@@ -34,7 +34,7 @@ describe("Edge color", function (): void {
         newOptions,
         allowDeletion,
         globalOptions,
-        copyFromGlobals
+        copyFromGlobals,
       );
 
       expect(parentOptions).to.have.ownProperty("color").that.deep.equals({
@@ -66,7 +66,7 @@ describe("Edge color", function (): void {
         newOptions,
         allowDeletion,
         globalOptions,
-        copyFromGlobals
+        copyFromGlobals,
       );
 
       expect(parentOptions).to.have.ownProperty("color").that.deep.equals({

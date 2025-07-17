@@ -1,5 +1,5 @@
-import { CubicBezierEdgeBase } from "./util/cubic-bezier-edge-base";
-import {
+import { CubicBezierEdgeBase } from "./util/cubic-bezier-edge-base.ts";
+import type {
   EdgeFormattingValues,
   Label,
   EdgeOptions,
@@ -8,7 +8,7 @@ import {
   SelectiveRequired,
   VBody,
   VNode,
-} from "./util/types";
+} from "./util/types.ts";
 
 /**
  * A Cubic Bezier Edge. Bezier curves are used to model smooth gradual curves in paths between nodes.
@@ -36,7 +36,7 @@ export class CubicBezierEdge extends CubicBezierEdgeBase<[Point, Point]> {
       | "shadowX"
       | "shadowY"
     >,
-    viaNodes: [Point, Point]
+    viaNodes: [Point, Point],
   ): void {
     // get the coordinates of the support points.
     const via1 = viaNodes[0];
@@ -90,7 +90,7 @@ export class CubicBezierEdge extends CubicBezierEdgeBase<[Point, Point]> {
   /** @inheritDoc */
   protected _findBorderPosition(
     nearNode: VNode,
-    ctx: CanvasRenderingContext2D
+    ctx: CanvasRenderingContext2D,
   ): PointT {
     return this._findBorderPositionBezier(nearNode, ctx);
   }
@@ -103,7 +103,7 @@ export class CubicBezierEdge extends CubicBezierEdgeBase<[Point, Point]> {
     y2: number,
     x3: number,
     y3: number,
-    [via1, via2]: [Point, Point] = this._getViaCoordinates()
+    [via1, via2]: [Point, Point] = this._getViaCoordinates(),
   ): number {
     // x3,y3 is the point
     return this._getDistanceToBezierEdge2(x1, y1, x2, y2, x3, y3, via1, via2);
@@ -112,7 +112,7 @@ export class CubicBezierEdge extends CubicBezierEdgeBase<[Point, Point]> {
   /** @inheritDoc */
   public getPoint(
     position: number,
-    [via1, via2]: [Point, Point] = this._getViaCoordinates()
+    [via1, via2]: [Point, Point] = this._getViaCoordinates(),
   ): Point {
     const t = position;
     const vec: [number, number, number, number] = [

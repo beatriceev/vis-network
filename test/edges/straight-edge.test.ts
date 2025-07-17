@@ -1,9 +1,9 @@
 import { expect } from "chai";
 import { assert, spy, stub } from "sinon";
-import { deepFreeze } from "../helpers";
-import { body } from "./helpers";
+import { deepFreeze } from "../helpers/index.ts";
+import { body } from "./helpers.ts";
 
-import { StraightEdge } from "../../lib/network/modules/components/edges";
+import { StraightEdge } from "../../lib/network/modules/components/edges/index.ts";
 
 describe("StraightEdge", function (): void {
   it("constructor", function (): void {
@@ -37,7 +37,7 @@ describe("StraightEdge", function (): void {
           to: 3,
         },
         body as any,
-        {} as any
+        {} as any,
       );
 
       edge.drawLine(ctx, { dashes: false }, false, false, body.nodes[2]);
@@ -74,7 +74,7 @@ describe("StraightEdge", function (): void {
           to: 3,
         },
         body as any,
-        {} as any
+        {} as any,
       );
 
       edge.drawLine(ctx as any, { dashes: [1, 2, 3] } as any, false, false);
@@ -102,7 +102,7 @@ describe("StraightEdge", function (): void {
         to: 3,
       },
       body as any,
-      {} as any
+      {} as any,
     );
 
     expect(edge.getViaNode()).to.be.undefined;
@@ -116,7 +116,7 @@ describe("StraightEdge", function (): void {
         to: 3,
       },
       body as any,
-      {} as any
+      {} as any,
     );
 
     expect(edge.getPoint(0.5)).to.deep.equal({
@@ -143,7 +143,7 @@ describe("StraightEdge", function (): void {
           to: 3,
         },
         body as any,
-        {} as any
+        {} as any,
       );
 
       const { x, y } = edge._findBorderPosition(node, ctx);
@@ -169,7 +169,7 @@ describe("StraightEdge", function (): void {
           to: 3,
         },
         body as any,
-        {} as any
+        {} as any,
       );
 
       const { x, y } = edge._findBorderPosition(node, ctx);
@@ -195,7 +195,7 @@ describe("StraightEdge", function (): void {
           to: 3,
         },
         body as any,
-        {} as any
+        {} as any,
       );
 
       const { x, y } = edge._findBorderPosition(node, ctx);
@@ -213,7 +213,7 @@ describe("StraightEdge", function (): void {
         to: 3,
       },
       body as any,
-      {} as any
+      {} as any,
     );
 
     expect(edge._getDistanceToEdge(10, -10, 20, -20, 10, 20)).to.equal(30);

@@ -1,6 +1,6 @@
 import { expect } from "chai";
-import Network from "../../lib/network/Network";
-import { canvasMockify } from "../canvas-mock";
+import Network from "../../lib/network/Network.js";
+import { canvasMockify } from "../canvas-mock.js";
 
 describe("wind", function (): void {
   beforeEach(function () {
@@ -31,7 +31,7 @@ describe("wind", function (): void {
           { from: 3, to: 4 },
         ],
       },
-      { physics: { wind: { x: 10, y: 0 }, stabilization: { iterations: 10 } } }
+      { physics: { wind: { x: 10, y: 0 }, stabilization: { iterations: 10 } } },
     );
 
     // Wait for the physics to stabilize.

@@ -1,7 +1,7 @@
 import { expect } from "chai";
-import Network from "../../lib/network/Network";
-import { canvasMockify } from "../canvas-mock";
-import { sortArrays } from "../helpers";
+import Network from "../../lib/network/Network.js";
+import { canvasMockify } from "../canvas-mock.js";
+import { sortArrays } from "../helpers/index.ts";
 
 describe("Network", function () {
   before(function () {
@@ -36,7 +36,7 @@ describe("Network", function () {
           { id: "E_5-2", from: "N_5", to: "N_2" },
         ],
       },
-      { physics: false }
+      { physics: false },
     );
 
     const events = {
@@ -69,7 +69,7 @@ describe("Network", function () {
       sortArrays({
         nodes: ["N_5"],
         edges: ["E_1-5", "E_4-5", "E_5-2"],
-      })
+      }),
     );
 
     expect(events["deselectEdge"]).to.have.length(0);
@@ -82,13 +82,13 @@ describe("Network", function () {
     // Select a node without it's edges.
     network.setSelection(
       { nodes: ["N_1"] },
-      { highlightEdges: false, unselectAll: false }
+      { highlightEdges: false, unselectAll: false },
     );
     expect(sortArrays(network.getSelection())).to.deep.equal(
       sortArrays({
         nodes: ["N_1", "N_5"],
         edges: ["E_1-5", "E_4-5", "E_5-2"],
-      })
+      }),
     );
 
     expect(events["deselectEdge"]).to.have.length(0);
@@ -104,7 +104,7 @@ describe("Network", function () {
       sortArrays({
         nodes: ["N_1", "N_5"],
         edges: ["E_1-5", "E_4-5", "E_5-2", "E_2-3", "E_3-4"],
-      })
+      }),
     );
 
     expect(events["deselectEdge"]).to.have.length(0);
@@ -120,7 +120,7 @@ describe("Network", function () {
       sortArrays({
         nodes: [],
         edges: [],
-      })
+      }),
     );
 
     expect(events["deselectEdge"]).to.have.length(0);

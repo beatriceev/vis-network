@@ -1,14 +1,14 @@
-import assert from "assert";
+import { expect } from "chai";
 
-import { canvasMockify } from "./canvas-mock";
+import { canvasMockify } from "./canvas-mock.js";
 import { Configurator } from "vis-util/esnext";
-import Network from "../lib/network/Network";
-import { configureOptions } from "../lib/network/options";
+import Network from "../lib/network/Network.js";
+import { configureOptions } from "../lib/network/options.ts";
 
 describe("Configurator", function () {
   beforeEach(function () {
     this.jsdomGlobalCleanup = canvasMockify(
-      "<div id='mynetwork'></div><div id='other'></div>"
+      "<div id='mynetwork'></div><div id='other'></div>",
     );
     this.container = document.getElementById("mynetwork");
   });
@@ -22,7 +22,7 @@ describe("Configurator", function () {
   describe("constructor", function () {
     it("sets extends options with default options", function () {
       const config = new Configurator();
-      assert.deepEqual(config.options, config.defaultOptions);
+      expect(config.options).to.deep.equal(config.defaultOptions);
     });
   });
 
@@ -30,28 +30,28 @@ describe("Configurator", function () {
     it("with undefined will not modify defaults", function () {
       const config = new Configurator(Network, this.container);
       config.setOptions();
-      assert.deepEqual(config.options, config.defaultOptions);
+      expect(config.options).to.deep.equal(config.defaultOptions);
     });
 
     it("with undefined will set enabled to false", function () {
       const config = new Configurator(Network, this.container);
       config.options.enabled = false;
       config.setOptions();
-      assert.equal(config.options.enabled, false);
+      expect(config.options.enabled).to.equal(false);
     });
 
     it("with string sets filter and set enabled to true", function () {
       const config = new Configurator(Network, this.container);
       config.setOptions("stringFilter!");
-      assert.equal(config.options.filter, "stringFilter!");
-      assert.equal(config.options.enabled, true);
+      expect(config.options.filter).to.equal("stringFilter!");
+      expect(config.options.enabled).to.equal(true);
     });
 
     it("with array sets filter and set enabled to true", function () {
       const config = new Configurator(Network, this.container);
       config.setOptions(["array", "Filter", "!"]);
-      assert.equal(config.options.filter, "array,Filter,!");
-      assert.equal(config.options.enabled, true);
+      expect(config.options.filter).to.equal("array,Filter,!");
+      expect(config.options.enabled).to.equal(true);
     });
 
     it("with object sets filter", function () {
@@ -62,45 +62,41 @@ describe("Configurator", function () {
         showButton: "newShowButton",
         enabled: false,
       });
-      assert.equal(config.options.container, "newContainer");
-      assert.equal(config.options.filter, "newFilter");
-      assert.equal(config.options.showButton, "newShowButton");
-      assert.equal(config.options.enabled, false);
+      expect(config.options.container).to.equal("newContainer");
+      expect(config.options.filter).to.equal("newFilter");
+      expect(config.options.showButton).to.equal("newShowButton");
+      expect(config.options.enabled).to.equal(false);
     });
 
     it("with object and filter is false enabled will be false", function () {
       const config = new Configurator(Network, this.container);
       config.setOptions({ filter: false });
-      assert.equal(config.options.enabled, false);
+      expect(config.options.enabled).to.equal(false);
     });
 
     it("with boolean true sets filter", function () {
       const config = new Configurator(Network, this.container);
       config.setOptions(true);
-      assert.equal(config.options.enabled, true);
+      expect(config.options.enabled).to.equal(true);
     });
 
     it("with boolean false sets filter", function () {
       const config = new Configurator(Network, this.container);
       config.setOptions(false);
-      assert.equal(config.options.enabled, false);
+      expect(config.options.enabled).to.equal(false);
     });
 
     it("with function sets filter", function () {
       const config = new Configurator(Network, this.container);
       config.setOptions(function () {});
-      assert.equal(config.options.enabled, true);
+      expect(config.options.enabled).to.equal(true);
     });
 
     it("with null raises exception", function () {
       const config = new Configurator(Network, this.container);
-      assert.throws(
-        function () {
-          config.setOptions(null);
-        },
-        TypeError,
-        null
-      );
+      expect(function () {
+        config.setOptions(null);
+      }).to.throw(TypeError);
     });
   });
 
@@ -108,17 +104,16 @@ describe("Configurator", function () {
     it("creates no new dom elements if enabled is false", function () {
       const config = new Configurator(Network, this.container);
       config.setModuleOptions();
-      assert.equal(this.container.children.length, 0);
+      expect(this.container.children.length).to.equal(0);
     });
 
     it("adds div with vis-configuration-wrapper class when enabled", function () {
       const config = new Configurator(Network, this.container);
       config.options.enabled = true;
       config.setModuleOptions();
-      assert.equal(this.container.children.length, 1);
-      assert.equal(
-        this.container.children[0].className,
-        "vis-configuration-wrapper"
+      expect(this.container.children.length).to.equal(1);
+      expect(this.container.children[0].className).to.equal(
+        "vis-configuration-wrapper",
       );
     });
 
@@ -127,10 +122,9 @@ describe("Configurator", function () {
       config.options.enabled = true;
       config.options.container = document.getElementById("other");
       config.setModuleOptions();
-      assert.equal(config.container, config.options.container);
-      assert.equal(
-        config.container.children[0].className,
-        "vis-configuration-wrapper"
+      expect(config.container).to.equal(config.options.container);
+      expect(config.container.children[0].className).to.equal(
+        "vis-configuration-wrapper",
       );
     });
   });
@@ -141,7 +135,7 @@ describe("Configurator", function () {
       const config = new Configurator(
         Network,
         this.container,
-        configureOptions
+        configureOptions,
       );
       config.getOptions();
     });

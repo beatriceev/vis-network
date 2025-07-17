@@ -1,5 +1,5 @@
-import { BezierEdgeBase } from "./bezier-edge-base";
-import { Label, EdgeOptions, Point, VBody } from "./types";
+import { BezierEdgeBase } from "./bezier-edge-base.ts";
+import type { Label, EdgeOptions, Point, VBody } from "./types.ts";
 
 /**
  * A Base Class for all Cubic Bezier Edges. Bezier curves are used to model
@@ -40,7 +40,7 @@ export abstract class CubicBezierEdgeBase<Via> extends BezierEdgeBase<Via> {
     x3: number,
     y3: number,
     via1: Point,
-    via2: Point
+    via2: Point,
   ): number {
     // x3,y3 is the point
     let minDistance = 1e9;
