@@ -67,19 +67,23 @@ export function fillLevelsByDirectionLeaves(nodes: Map<Id, Node>): Levels {
     }
   });
 
-  if (entryNodes.length === 0) {
-    return fillLevelsByDirectionCyclic(nodes, {});
+  const levels: Levels = {};
+  if (entryNodes.length > 0) {
+    fillLevelsByDirection(
+      // Pick only leaves (nodes without children).
+      (node): boolean => entryNodes.includes(node),
+      // Use the lowest level.
+      (newLevel, oldLevel): boolean => oldLevel > newLevel,
+      // Go against the direction of the edges.
+      "from",
+      nodes,
+      levels
+    );
   }
 
-  return fillLevelsByDirection(
-    // Pick only leaves (nodes without children).
-    (node): boolean => entryNodes.includes(node),
-    // Use the lowest level.
-    (newLevel, oldLevel): boolean => oldLevel > newLevel,
-    // Go against the direction of the edges.
-    "from",
-    nodes
-  );
+  // Fallback: handle nodes not yet assigned a level (likely cyclic)
+  processCyclicNodes(nodes, levels);
+  return levels;
 }
 
 /**
@@ -102,19 +106,23 @@ export function fillLevelsByDirectionRoots(nodes: Map<Id, Node>): Levels {
     }
   });
 
-  if (entryNodes.length === 0) {
-    return fillLevelsByDirectionCyclic(nodes, {});
+  const levels: Levels = {};
+  if (entryNodes.length > 0) {
+    fillLevelsByDirection(
+      // Pick only roots (nodes without parents).
+      (node): boolean => entryNodes.includes(node),
+      // Use the highest level.
+      (newLevel, oldLevel): boolean => oldLevel < newLevel,
+      // Go in the direction of the edges.
+      "to",
+      nodes,
+      levels
+    );
   }
 
-  return fillLevelsByDirection(
-    // Pick only roots (nodes without parents).
-    (node): boolean => entryNodes.includes(node),
-    // Use the highest level.
-    (newLevel, oldLevel): boolean => oldLevel < newLevel,
-    // Go in the direction of the edges.
-    "to",
-    nodes
-  );
+  // Fallback: handle nodes not yet assigned a level (likely cyclic)
+  processCyclicNodes(nodes, levels);
+  return levels;
 }
 
 /**
@@ -123,16 +131,16 @@ export function fillLevelsByDirectionRoots(nodes: Map<Id, Node>): Levels {
  * @param shouldLevelBeReplaced - Checks and returns true if the level of given node should be updated to the new value.
  * @param direction - Wheter the graph should be traversed in the direction of the edges `"to"` or in the other way `"from"`.
  * @param nodes - Visible nodes of the graph.
+ * @param levels
  * @returns Populated node levels.
  */
 function fillLevelsByDirection(
   isEntryNode: (node: Node) => boolean,
   shouldLevelBeReplaced: (newLevel: number, oldLevel: number) => boolean,
   direction: "to" | "from",
-  nodes: Map<Id, Node>
+  nodes: Map<Id, Node>,
+  levels: Levels = Object.create(null)
 ): Levels {
-  const levels = Object.create(null);
-
   // If acyclic, the graph can be walked through with (most likely way) fewer
   // steps than the number bellow. The exact value isn't too important as long
   // as it's quick to compute (doesn't impact acyclic graphs too much), is
@@ -205,4 +213,26 @@ function fillLevelsByDirection(
   }
 
   return levels;
+}
+
+/**
+ * Process nodes that weren't assigned levels during the main hierarchy traversal.
+ * This typically handles nodes that are part of cycles or disconnected components
+ * that couldn't be reached from the initial entry points (roots/leaves).
+ * @param nodes - All visible nodes in the graph.
+ * @param levels - Current level assignments that will be modified in-place.
+ */
+function processCyclicNodes(nodes: Map<Id, Node>, levels: Levels): void {
+  const unprocessedNodes = new Map<Id, Node>();
+
+  nodes.forEach((node, id) => {
+    if (levels[id] == null) {
+      unprocessedNodes.set(id, node);
+    }
+  });
+
+  if (unprocessedNodes.size > 0) {
+    // Assign levels to nodes that were not processed yet.
+    fillLevelsByDirectionCyclic(unprocessedNodes, levels);
+  }
 }
